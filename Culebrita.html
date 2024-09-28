@@ -39,6 +39,7 @@
 
         let score = 0;
         let d;
+        let countdown;
 
         // Control de la serpiente
         document.addEventListener("keydown", direction);
@@ -110,8 +111,20 @@
                 snakeY >= canvas.height ||
                 collision(newHead, snake)
             ) {
-                clearInterval(game);
-                alert("Juego terminado. Puntuación: " + score);
+                clearInterval(game); // Detener el intervalo
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Mostrar mensaje de fin del juego
+                ctx.fillStyle = "white"; 
+                ctx.font = "30px Changa one"; 
+                const gameOverText = `Juego terminado. Puntuación: ${score}`;
+                const textWidth = ctx.measureText(gameOverText).width; 
+                ctx.fillText(gameOverText, (canvas.width - textWidth) / 2, canvas.height / 2);
+
+                // Iniciar la cuenta regresiva automáticamente
+                countdown = 5;
+                displayCountdown();
+                return;
             }
 
             snake.unshift(newHead);
@@ -122,7 +135,38 @@
             ctx.fillText(score, 2 * box, 1.5 * box);
         }
 
+        function displayCountdown(){
+            const countdownInterval = setInterval(() => {
+                if (countdown > 0) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "white"; // Asegúrate de que el texto sea visible
+                    ctx.font = "30px Changa one";
+                    ctx.fillText(`Reiniciando en: ${countdown}`, canvas.width / 2 - 120, canvas.height / 2);
+                    countdown--;
+                } else {
+                    clearInterval(countdownInterval);
+                    resetGame();
+                }
+            }, 1000);
+        }
+
+        // Función resetGame
+        function resetGame() {
+            snake = [];
+            snake[0] = { x: 9 * box, y: 10 * box };
+            d = null;
+            score = 0;
+            food = {
+                x: Math.floor(Math.random() * cols) * box,
+                y: Math.floor(Math.random() * rows) * box,
+            };
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            game = setInterval(drawGame, 100);
+        }
+
+        // Iniciar el juego por primera vez
         let game = setInterval(drawGame, 100);
+        
     </script>
 </body>
 </html>
